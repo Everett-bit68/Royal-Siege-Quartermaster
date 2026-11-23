@@ -1,0 +1,82 @@
+*{
+    box-sizing: border-box; margin: 0; padding: 0;
+}
+body{
+    background: #0b0d14; color: #eef1f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+header{
+    display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: #131724;
+    border-bottom: 1px solid #2a324a;
+}
+header h1{
+    font-size: 1.25rem; color: #e4b857; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.header-right{
+    display: flex; align-items: center; gap: 1rem;
+}
+main{
+    display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 1.5rem; max-width: 1150px; margin: 0 auto;
+}
+.battlefield{
+    flex: 1 1 620px; background: #131724; border: 1px solid #2a324a; border-radius: 8px; padding: 1.25rem;
+    display: flex; flex-direction: column; gap: 1rem;
+}
+.resources{
+    display: flex; gap: 0.75rem;
+}
+.res{
+    flex: 1; background: #191f30; border: 1px solid #2a324a; border-radius: 6px; padding: 0.6rem 0.85rem; font-size: 0.9rem;
+}
+.res-timber strong{color: #d48c46;}
+.res-iron strong{color: #8eb4d9;}
+.res-mana strong{color: #b37feb;}
+.lanes-list{
+    display: flex; flex-direction: column; gap: 0.75rem;
+}
+.lane{
+    background: #101420; border: 2px solid #2a324a; border-radius: 6px; padding: 0.85rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: center; cursor: pointer;
+}
+.lane-selected{
+    border-color: #e4b857; background: #161c2e;
+}
+.lane-info strong{
+    display: block; margin-bottom: 0.25rem;
+}
+.lane-track{
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5rem; min-height: 64px;
+}
+.slot{
+    border: 1px dashed #2a324a; border-radius: 4px; padding: 0.4rem; font-size: 0.78rem; display: flex;
+    flex-direction: column; justify-content: center; align-items: center; text-align: center;
+}
+.enemy{
+    background: #251a24; border: 1px solid #8e3b46; border-radius: 4px; padding: 0.3rem;
+    width: 100%;
+}
+.enemy-stunned{
+    border-color: #b37feb;
+}
+.status-log{
+    background: #0d1019; border: 1px solid #2a324a; border-radius: 6px; padding: 0.75rem; font-size: 0.88rem;
+    color: #cbd5e1;
+}
+.controls{
+    flex: 0 0 300px; background: #131724; border: 1px solid #2a324a; border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
+}
+.controls h2{
+    font-size: 1rem; color: #e4b857;
+}
+button{
+    background: #191f30; color: #eef1f8; border: 1px solid #2a324a; border-radius: 6px;
+    padding: 0.7rem 0.9rem; font-family: inherit; font-weight: 600; cursor: pointer; text-align: left;
+}
+button:hover:not(:disabled){
+    border-color: #e4b857;
+}
+button:disabled{
+    opacity: 0.45; cursor: not-allowed;
+}
+.end-turn-btn{
+    margin-top: 0.5rem; background: #d8a63c; color: #12100b; border-color: #f0c96b; text-align: center;
+}
