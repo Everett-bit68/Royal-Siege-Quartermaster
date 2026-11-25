@@ -71,7 +71,7 @@ function fireBallista(){
     const lane = state.lanes[state.selectedLane];
     if (state.gameOver||state.iron < 2||lane.enemies.length === 0)return;
     state.iron -=2;
-    lane.enemies,sort((a,b)=> a.pos - b.pos);
+    lane.enemies.sort((a,b)=> a.pos - b.pos);
     const target = lane.enemies[0];
     target.hp -= 35;
     if (target.hp <=0){
@@ -160,7 +160,7 @@ function render(){
             const enemy = lane.enemies.find((e)=> e.pos === pos);
             if (enemy){
                 slot.innerHTML = `
-                <div class="enemy ${enemy,stunned ? "stunned" : ""}">
+                <div class="enemy ${enemy.stunned ? "stunned" : ""}">
                     <strong>${enemy.name}</strong><br>
                     HP: ${enemy.hp} | ATK: ${enemy.atk}
                 </div>
@@ -178,7 +178,7 @@ function render(){
     selectedLaneLabel.textContent = `LANE: ${active.name}`;
     repairBtn.disabled = state.gameOver || state.timber < 2 || active.hp >= active.maxHp;
     ballistaBtn.disabled = state.gameOver || state.iron < 2 || active.enemies.length === 0;
-    arcaneBtn.disabled = state.gameOver;
+    arcaneBtn.disabled = state.gameOver || state.mana < 2 || active.enemies.length ===0;
 }
 repairBtn.onclick = repairWall;
 ballistaBtn.onclick = fireBallista;

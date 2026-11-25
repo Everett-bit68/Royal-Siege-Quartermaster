@@ -28,16 +28,16 @@ main{
 .res{
     flex: 1; background: #191f30; border: 1px solid #2a324a; border-radius: 6px; padding: 0.6rem 0.85rem; font-size: 0.9rem;
 }
-.res-timber strong{color: #d48c46;}
-.res-iron strong{color: #8eb4d9;}
-.res-mana strong{color: #b37feb;}
+.res.timber strong{color: #d48c46;}
+.res.iron strong{color: #8eb4d9;}
+.res.mana strong{color: #b37feb;}
 .lanes-list{
     display: flex; flex-direction: column; gap: 0.75rem;
 }
 .lane{
     background: #101420; border: 2px solid #2a324a; border-radius: 6px; padding: 0.85rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; align-items: center; cursor: pointer;
 }
-.lane-selected{
+.lane.selected{
     border-color: #e4b857; background: #161c2e;
 }
 .lane-info strong{
@@ -54,7 +54,7 @@ main{
     background: #251a24; border: 1px solid #8e3b46; border-radius: 4px; padding: 0.3rem;
     width: 100%;
 }
-.enemy-stunned{
+.enemy.stunned{
     border-color: #b37feb;
 }
 .status-log{
