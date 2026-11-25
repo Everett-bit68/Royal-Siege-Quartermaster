@@ -128,7 +128,9 @@ function endTurn(){
         render();
         return;
     }
-    state.turn +=1;
+    if (state.turn < MAX_TURNS){
+        state.turn +=1;
+    }
     state.timber +=2;
     state.iron +=2;
     state.mana +=2;
