@@ -20,10 +20,11 @@ const ballistaBtn = document.getElementById("ballista-btn");
 const arcaneBtn = document.getElementById("arcane-btn");
 const endTurnBtn = document.getElementById("end-turn-btn");
 const resetBtn = document.getElementById("reset-btn");
+const audioToggleBtn = document.getElementById("audio-toggle");
 let soundEnabled = true;
 let audioCtx = null;
 function selectLane(idx){
-    if (idx < 0 || idx.state.lanes.length) return;
+    if (idx < 0 || idx >= state.lanes.length) return;
     state.selectLane = idx;
     SoundFX.select();
     render();
@@ -176,7 +177,7 @@ function playSound (freq, duration = 0.12, type = "triangle", volume = 0.08){
         osc.type = type;
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-        gain.gain.expoentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
@@ -268,7 +269,7 @@ document.addEventListener("keydown", (e)=>{
     else if (key === "q") repairWall();
     else if (key === "w") fireBallista();
     else if (key === "e") castArcaneNova();
-    else if (e.code === "space" || key === " "){
+    else if (e.code === "Space" || key === " "){
         e.preventDefault();
         endTurn();
     } else if (key === "r"){
