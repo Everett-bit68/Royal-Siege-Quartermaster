@@ -80,3 +80,6 @@ button:disabled{
 .end-turn-btn{
     margin-top: 0.5rem; background: #d8a63c; color: #12100b; border-color: #f0c96b; text-align: center;
 }
+.header-right button{
+    text-align: center; padding: 0.45rem 0.75rem; font-size: 0.82rem;
+}

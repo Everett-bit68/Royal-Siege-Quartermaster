@@ -20,6 +20,14 @@ const ballistaBtn = document.getElementById("ballista-btn");
 const arcaneBtn = document.getElementById("arcane-btn");
 const endTurnBtn = document.getElementById("end-turn-btn");
 const resetBtn = document.getElementById("reset-btn");
+let soundEnabled = true;
+let audioCtx = null;
+function selectLane(idx){
+    if (idx < 0 || idx.state.lanes.length) return;
+    state.selectLane = idx;
+    SoundFX.select();
+    render();
+}
 function initGame(){
     state = {
         turn :1,
@@ -61,19 +69,27 @@ function spawnEnemiesForTurn(turn){
 }
 function repairWall(){
     const lane = state.lanes[state.selectedLane];
-    if (state.gameOver||state.timber<2||lane.hp >= lane.maxHp) return;
+    if (state.gameOver||state.timber<2||lane.hp >= lane.maxHp){
+        SoundFX.error();
+        return;
+    }
     state.timber -=2;
     lane.hp = Math.min(lane.maxHp, lane.hp + 25);
+    SoundFX.repair();
     statusLog.textContent = `Fortified ${lane.name} (+25HP).`;
     render();
 }
 function fireBallista(){
     const lane = state.lanes[state.selectedLane];
-    if (state.gameOver||state.iron < 2||lane.enemies.length === 0)return;
+    if (state.gameOver||state.iron < 2||lane.enemies.length === 0){
+        SoundFX.error();
+        return;
+    }
     state.iron -=2;
     lane.enemies.sort((a,b)=> a.pos - b.pos);
     const target = lane.enemies[0];
     target.hp -= 35;
+    SoundFX.ballista();
     if (target.hp <=0){
         lane.enemies.shift();
         statusLog.textContent = `Ballista destroyed ${target.name} in ${lane.name}`;
@@ -84,7 +100,10 @@ function fireBallista(){
 }
 function castArcaneNova(){
     const lane = state.lanes[state.selectedLane];
-    if (state.gameOver || state.mana <2 || lane.enemies.length === 0) return;
+    if (state.gameOver || state.mana <2 || lane.enemies.length === 0) {
+        SoundFX.error();
+        return;
+    }
     state.mana -= 2;
     lane.enemies = lane.enemies.filter((enemy)=>{
         enemy.hp -= 25;
@@ -94,6 +113,7 @@ function castArcaneNova(){
         }
         return false;
     });
+    SoundFX.arcane();
     statusLog.textContent = `Arcane Nova hit all enemies in ${lane.name}`;
     render();
 }
@@ -117,6 +137,7 @@ function endTurn(){
     const breached = state.lanes.find((l)=>l.hp<=0);
     if (breached){
         state.gameOver = true;
+        SoundFX.defeat();
         statusLog.textContent = `DEFEAT: ${breached.name} was breached!`;
         render();
         return;
@@ -124,6 +145,7 @@ function endTurn(){
     const totalEnemies = state.lanes.reduce((sum,l)=> sum + l.enemies.length,0);
     if (state.turn >= MAX_TURNS && totalEnemies === 0){
         state.gameOver = true;
+        SoundFX.victory();
         statusLog.textContent = "VICTORY: The citadel held against the siege!";
         render();
         return;
@@ -135,9 +157,49 @@ function endTurn(){
     state.iron +=2;
     state.mana +=2;
     spawnEnemiesForTurn(state.turn);
+    SoundFX.turn();
     statusLog.textContent = "Turn ended. Enemies advanced and +2 supplies arrived.";
     render();
 }
+function playSound (freq, duration = 0.12, type = "triangle", volume = 0.08){
+    if (!soundEnabled) return;
+    try{
+        if (!audioCtx){
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === "suspended"){
+            audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.expoentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    } catch (_) {}
+}
+const SoundFX = {
+    select: () =>playSound(420,0.06, "sine", 0.05),
+    repair: () => playSound(310, 0.15,"triangle",0.09),
+    ballista: () =>playSound(190,0.16,"square",0.07),
+    arcane: () => playSound(540,0.22,"sine",0.09),
+    turn: () => playSound(260,0.11,"triangle", 0.06),
+    error: ()=>playSound(140,0.1,"sawtooth", 0.05),
+    victory: () =>{
+        playSound(523,0.14,"triangle",0.08);
+        setTimeout(()=> playSound(659,0.14,"triangle",0.08),110);
+        setTimeout(()=> playSound(784,0.24,"triangle",0.09), 220);
+    },
+    defeat: ()=>{
+        playSound(229, 0.18, "sawtooth", 0.08);
+        setTimeout(()=> playSound(150, 0.28, "sawtooth",0.08),150);
+    }
+};
 function render(){
     turnDisplay.textContent = `TURN ${Math.min(state.turn, MAX_TURNS)}/${MAX_TURNS}`;
     timberVal.textContent = state.timber;
@@ -186,5 +248,13 @@ repairBtn.onclick = repairWall;
 ballistaBtn.onclick = fireBallista;
 arcaneBtn.onclick = castArcaneNova;
 endTurnBtn.onclick = endTurn;
-resetBtn.onclick = initGame;
+resetBtn.onclick = () => {
+    SoundFX.select();
+    initGame();
+};
+audioToggleBtn.onclick = () =>{
+    soundEnabled = !soundEnabled;
+    audioToggleBtn.textContent = `SOUND: ${soundEnabled ? "ON" : "OFF"}`;
+    if (soundEnabled) SoundFX.select();
+}
 initGame();
