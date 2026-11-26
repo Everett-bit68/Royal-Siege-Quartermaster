@@ -256,5 +256,24 @@ audioToggleBtn.onclick = () =>{
     soundEnabled = !soundEnabled;
     audioToggleBtn.textContent = `SOUND: ${soundEnabled ? "ON" : "OFF"}`;
     if (soundEnabled) SoundFX.select();
-}
+};
+document.addEventListener("keydown", (e)=>{
+    if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = e.target && e.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    const key = e.key.toLowerCase();
+    if (key === "1") selectLane(0);
+    else if (key === "2") selectLane(1);
+    else if (key === "3") selectLane(2);
+    else if (key === "q") repairWall();
+    else if (key === "w") fireBallista();
+    else if (key === "e") castArcaneNova();
+    else if (e.code === "space" || key === " "){
+        e.preventDefault();
+        endTurn();
+    } else if (key === "r"){
+        SoundFX.select();
+        initGame();
+    }
+});
 initGame();
