@@ -1,3 +1,5 @@
+const { act } = require("react");
+
 const MAX_TURNS = 6;
 const INITIAL_SPAWNS = [
     {turn:1,lane:0,name: "Goblin Sapper", hp: 35, atk: 20},
@@ -8,6 +10,7 @@ const INITIAL_SPAWNS = [
     {turn: 5, lane:1,name: "Warlord", hp: 80,atk: 35}
 ];
 let state = {};
+let previewMode = null;
 const turnDisplay = document.getElementById("turn-display");
 const timberVal = document.getElementById("timber-val");
 const ironVal = document.getElementById("iron-val");
@@ -201,6 +204,60 @@ const SoundFX = {
         setTimeout(()=> playSound(150, 0.28, "sawtooth",0.08),150);
     }
 };
+function getLaneThreat(lane){
+    return lane.enemies.reduce((sum,enemy)=>{
+        if (!enemy.stunned && enemy.pos === 0){
+            return sum + enemy.atk;
+        }
+        return sum;
+    }, 0);
+}
+function getFrontEnemy(lane){
+    if (!lane || lane.enemies.length === 0) return null;
+    return [...lane.enemies].sort((a,b) => a.pos - b.pos)[0];
+}
+function setPreview(mode){
+    previewMode = mode;
+    render();
+}
+function renderPreviewText(activeLane){
+    if (state.gameOver || !previewMode) return;
+    if (previewMode === "repair"){
+        const gain = Math.min(25, activeLane.maxHp - activeLane.hp);
+        statusLog.textContent = gain > 0 ? `Preview: Fortify ${activeLane.name} for +${gain} Wall HP (-2 Timber).` : `Preview: ${activeLane.name} is already at full Wall HP.`;
+    } else if (previewMode === "ballista"){
+        const target = getFrontEnemy(activeLane);
+        if (!target){
+            statusLog.textContent = `Preview: No enemies in ${activeLane.name} to target.`
+        } else {
+            const afterHp = Math.max(0, target.hp - 35);
+            statusLog.textContent = `Preview: Ballista hits ${target.name} for 35 DMG (${target.hp} -> ${afterHp} HP).`;
+        }
+    } else if (previewMode === "arcane"){
+        if (activeLane.enemies.length === 0){
+            statusLog.textContent = `Preview: No enemies in ${activeLane.name} for Arcane Nova.`;
+        } else{
+            statusLog.textContent = `Preview: Arcane Nova hits ${activeLane.enemies.length} enemy/enemies in ${activeLane.name} for 25 DMG & Stun.`;
+        }
+    }
+}
+function getEnemyTelegraph(lane,enemy){
+    if (enemy.stunned){
+        return { text: "STUNNED (SKIP)", isStrike: false};
+    }
+    if (enemy.pos === 0){
+        return {text: `STRIKE WALL (-${enemy.atk} HP)`, isStrike: true};
+    }
+    const blocked = lane.enemies.some((other)=> other !== enemy && other.pos === enemy.pos - 1);
+    if (blocked){
+        return { text: "BLOCKED", isStrike: false};
+    }
+    const nextPos = enemy.pos - 1;
+    return{
+        text: nextPos === 0 ? "ADVANCE --> WALL" : `ADVANCE --> TILE ${nextPos}`,
+        isStrike: false
+    };
+}
 function render(){
     turnDisplay.textContent = `TURN ${Math.min(state.turn, MAX_TURNS)}/${MAX_TURNS}`;
     timberVal.textContent = state.timber;
@@ -239,14 +296,23 @@ function render(){
         laneEl.appendChild(trackEl);
         laneslist.appendChild(laneEl);
     });
-    const active = state.lanes[state.selectedLane];
     selectedLaneLabel.textContent = `LANE: ${active.name}`;
-    repairBtn.disabled = state.gameOver || state.timber < 2 || active.hp >= active.maxHp;
-    ballistaBtn.disabled = state.gameOver || state.iron < 2 || active.enemies.length === 0;
-    arcaneBtn.disabled = state.gameOver || state.mana < 2 || active.enemies.length ===0;
+    renderPreviewText(active);
 }
+repairBtn.onmouseenter = () => setPreview("repair");
+repairBtn.onmouseleave = () => setPreview(null);
+repairBtn.onfocus = () => setPreview("repair");
+repairBtn.onblur = () => setPreview(null);
 repairBtn.onclick = repairWall;
+ballistaBtn.onmouseenter = () => setPreview("ballista");
+ballistaBtn.onmouseleave = () => setPreview(null);
+ballistaBtn.onfocus = () => setPreview("ballista");
+ballistaBtn.onblur = () => setPreview(null);
 ballistaBtn.onclick = fireBallista;
+arcaneBtn.onmouseenter = () => setPreview("arcane");
+arcaneBtn.onmouseleave = () => setPreview(null);
+arcaneBtn.onfocus = () => setPreview("arcane");
+arcaneBtn.onblur = () => setPreview(null);
 arcaneBtn.onclick = castArcaneNova;
 endTurnBtn.onclick = endTurn;
 resetBtn.onclick = () => {
