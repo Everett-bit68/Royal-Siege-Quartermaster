@@ -1,5 +1,3 @@
-const { act } = require("react");
-
 const MAX_TURNS = 6;
 const INITIAL_SPAWNS = [
     {turn:1,lane:0,name: "Goblin Sapper", hp: 35, atk: 20},
@@ -28,11 +26,12 @@ let soundEnabled = true;
 let audioCtx = null;
 function selectLane(idx){
     if (idx < 0 || idx >= state.lanes.length) return;
-    state.selectLane = idx;
+    state.selectedLane = idx;
     SoundFX.select();
     render();
 }
 function initGame(){
+    previewMode = null;
     state = {
         turn :1,
         selectedLane:0,
@@ -122,6 +121,7 @@ function castArcaneNova(){
     render();
 }
 function endTurn(){
+    previewMode = null;
     if (state.gameOver) return;
     state.lanes.forEach((lane)=>{
         lane.enemies.sort((a,b) =>a.pos-b.pos);
@@ -264,16 +264,20 @@ function render(){
     ironVal.textContent = state.iron;
     manaVal.textContent = state.mana;
     laneslist.innerHTML = "";
+    const active = state.lanes[state.selectedLane];
+    repairBtn.disabled = state.gameOver || state.timber < 2 || active.hp >= active.maxHp;
+    ballistaBtn.disabled = state.gameOver || state.iron < 2 || active.enemies.length === 0;
+    arcaneBtn.disabled = state.gameOver || state.mana < 2 || active.enemies.length === 0;
     state.lanes.forEach((lane,idx)=>{
+        const isSelected = idx === state.selectedLane;
+        const threat = getLaneThreat(lane);
+        const frontEnemy = isSelected ? getFrontEnemy(lane) : null;
         const laneEl = document.createElement("div");
-        laneEl.className = `lane ${idx === state.selectedLane ? "selected" : ""}`;
-        laneEl.onclick = () => {
-            state.selectedLane = idx;
-            render();
-        };
+        laneEl.className = `lane ${idx === state.selectedLane ? "selected" : ""} ${isSelected && previewMode === "repair" && !repairBtn.disabled ? "repair-preview" : ""}`;
+        laneEl.onclick = () => selectedLane(idx);
         const infoEl = document.createElement("div");
         infoEl.className = "lane-info";
-        infoEl.innerHTML = `<strong>${lane.name}</strong><span>WALL HP: ${lane.hp}/${lane.maxHp}</span>`;
+        infoEl.innerHTML = `<strong>${lane.name}</strong><span>WALL HP: ${lane.hp}/${lane.maxHp}</span><span class="lane-threat ${threat > 0 ? "danger": ""}"> ${threat > 0 ? `Incoming -${threat} HP` : "Incoming 0 HP"}</span>`;
         const trackEl = document.createElement("div");
         trackEl.className = "lane-track";
         for (let pos = 0; pos <4; pos++){
@@ -281,10 +285,20 @@ function render(){
             slot.className = "slot";
             const enemy = lane.enemies.find((e)=> e.pos === pos);
             if (enemy){
+                const telegraph = getEnemyTelegraph(lane,enemy);
+                let previewClass = "";
+                if (isSelected && !state.gameOver){
+                    if (previewMode === "ballista" && !ballistaBtn.disabled && frontEnemy === enemy){
+                        previewClass = "target-preview";
+                    } else if (previewMode === "arcane" && !arcaneBtn.disabled){
+                        previewClass = "aoe-preview";
+                    }
+                }
                 slot.innerHTML = `
                 <div class="enemy ${enemy.stunned ? "stunned" : ""}">
                     <strong>${enemy.name}</strong><br>
                     HP: ${enemy.hp} | ATK: ${enemy.atk}
+                    <div class="enemy-intent ${telegraph.isStrike ? "strike" : ""}"> ${telegraph.text}</div>
                 </div>
                 `;
             } else {
