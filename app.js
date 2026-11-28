@@ -28,8 +28,8 @@ const STAGES = [
             {turn:1,lane: 1,name: "Goblin Sapper", hp:40,atk:22},
             {turn: 2,lane:2,name: "Battering Ram", hp:70,atk:32},
             {turn:3, lane: 0,name: "Iron Vanguard",hp: 60,atk:26},
-            {turn:4,lane:1,name: "Flame catapult",hp: 50,atk: 28},
-            {turn: 5,lane: 2,name: "Siege Ogre",hp: 80,atk: 54},
+            {turn:4,lane:1,name: "Flame Catapult",hp: 50,atk: 28},
+            {turn: 5,lane: 2,name: "Siege Ogre",hp: 80,atk: 34},
             {turn:6,lane: 0,name: "Warlord",hp: 90, atk:36}
         ]
     }
@@ -60,6 +60,7 @@ function selectLane(idx){
 }
 function initGame(){
     previewMode = null;
+    const stage = STAGES[1];
     state = {
         turn :1,
         selectedLane:0,
@@ -178,6 +179,7 @@ function endTurn(){
         render();
         return;
     }
+    const maxTurns = getCurrentStage().maxTurns;
     const totalEnemies = state.lanes.reduce((sum,l)=> sum + l.enemies.length,0);
     if (state.turn >= MAX_TURNS && totalEnemies === 0){
         state.gameOver = true;
@@ -188,7 +190,7 @@ function endTurn(){
         render();
         return;
     }
-    if (state.turn < MAX_TURNS){
+    if (state.turn < maxTurns){
         state.turn +=1;
     }
     state.timber +=2;
@@ -293,7 +295,8 @@ function getEnemyTelegraph(lane,enemy){
     };
 }
 function render(){
-    turnDisplay.textContent = `TURN ${Math.min(state.turn, MAX_TURNS)}/${MAX_TURNS}`;
+    const maxTurns = getCurrentStage().maxTurns;
+    turnDisplay.textContent = `TURN ${Math.min(state.turn, maxTurns)}/${maxTurns}`;
     timberVal.textContent = state.timber;
     ironVal.textContent = state.iron;
     manaVal.textContent = state.mana;
@@ -393,6 +396,7 @@ document.addEventListener("keydown", (e)=>{
     }
 });
 function renderSummary(){
+    const maxTurns = getCurrentStage().maxTurns;
     if (!state.gameOver){
         summaryBanner.className = "summary-banner hidden";
         summaryBanner.innerHTML = "";
@@ -409,7 +413,7 @@ function renderSummary(){
             <span>${state.summaryReason}</span>
         </div>
         <div class="summary-stats">
-            <span>Turn Reached: <strong>${Math.min(state.turn, MAX_TURNS)}/${MAX_TURNS}</strong></span>
+            <span>Turn Reached: <strong>${Math.min(state.turn, maxTurns)}/${maxTurns}</strong></span>
             <span>Combined Wall HP: <strong>${totalWallHp}/${totalmaxHp}</strong></span>
             <span>Enemies left: <strong>${enemiesRemaining}</strong></span>
         </div>
@@ -426,5 +430,8 @@ function renderSummary(){
             initGame();
         };
     }
+}
+function getCurrentStage(){
+    return STAGES[state.stageIndex ?? 1] || STAGES[1];
 }
 initGame();
