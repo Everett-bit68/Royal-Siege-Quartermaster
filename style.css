@@ -114,7 +114,7 @@ button:disabled{
     border-color: #52c41a; background: #122219;
 }
 .summary-banner.defeat{
-    border-color: #ff6b6b; background: #242418;
+    border-color: #ff6b6b; background: #241418;
 }
 .summary-header{
     display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;

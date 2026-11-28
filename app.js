@@ -1,11 +1,38 @@
 const MAX_TURNS = 6;
-const INITIAL_SPAWNS = [
-    {turn:1,lane:0,name: "Goblin Sapper", hp: 35, atk: 20},
-    {turn: 1, lane:2, name: "Orc Raider", hp: 45,atk:22},
-    {turn: 2, lane: 1, name: "Battering Ram", hp: 65, atk:30},
-    {turn: 3, lane:0,name: "Flame Catapult", hp: 40, atk:25},
-    {turn: 4, lane: 2,name: "Siege Ogre", hp: 70, atk: 32},
-    {turn: 5, lane:1,name: "Warlord", hp: 80,atk: 35}
+const STAGES = [
+    {
+        name: "Stage 1: Outskirts Breach",
+        maxTurns: 6,
+        timber: 4,
+        iron: 4,
+        mana: 3,
+        wallHp: 100,
+        spawns: [
+            {turn:1,lane:0,name: "Goblin Sapper", hp: 35, atk: 20},
+            {turn: 1, lane:2, name: "Orc Raider", hp: 45,atk:22},
+            {turn: 2, lane: 1, name: "Battering Ram", hp: 65, atk:30},
+            {turn: 3, lane:0,name: "Flame Catapult", hp: 40, atk:25},
+            {turn: 4, lane: 2,name: "Siege Ogre", hp: 70, atk: 32},
+            {turn: 5, lane:1,name: "Warlord", hp: 80,atk: 35}
+        ]
+    },
+    {
+        name: "Stage 2: Ironclad Push",
+        maxTurns: 7,
+        timber: 5,
+        iron: 5,
+        mana: 3,
+        wallHp: 110,
+        spawns: [
+            {turn: 1,lane:0, name:"Orc Raider", hp: 45,atk:22},
+            {turn:1,lane: 1,name: "Goblin Sapper", hp:40,atk:22},
+            {turn: 2,lane:2,name: "Battering Ram", hp:70,atk:32},
+            {turn:3, lane: 0,name: "Iron Vanguard",hp: 60,atk:26},
+            {turn:4,lane:1,name: "Flame catapult",hp: 50,atk: 28},
+            {turn: 5,lane: 2,name: "Siege Ogre",hp: 80,atk: 54},
+            {turn:6,lane: 0,name: "Warlord",hp: 90, atk:36}
+        ]
+    }
 ];
 let state = {};
 let previewMode = null;
