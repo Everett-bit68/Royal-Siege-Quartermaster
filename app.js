@@ -62,6 +62,7 @@ function initGame(){
     previewMode = null;
     const stage = STAGES[1];
     state = {
+        stageIndex:1,
         turn :1,
         selectedLane:0,
         timber:4,
@@ -181,7 +182,7 @@ function endTurn(){
     }
     const maxTurns = getCurrentStage().maxTurns;
     const totalEnemies = state.lanes.reduce((sum,l)=> sum + l.enemies.length,0);
-    if (state.turn >= MAX_TURNS && totalEnemies === 0){
+    if (state.turn >= maxTurns && totalEnemies === 0){
         state.gameOver = true;
         state.outcome = "victory";
         state.summaryReason = "All siege waves repelled and every wall held.";
