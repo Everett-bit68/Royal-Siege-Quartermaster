@@ -89,7 +89,7 @@ function initGame(){
         gameOver: false,
         outcome: null,
         summaryReason: "",
-        spawns: INITIAL_SPAWNS.map((s)=> ({...s})),
+        spawns: stage.spawns.map((s)=> ({...s})),
         lanes:[
             {name: "NORTH GATE", hp: 100, maxHp: 100, enemies: []},
             {name: "CENTRAL KEEP", hp: 100, maxHp: 100, enemies: []},
