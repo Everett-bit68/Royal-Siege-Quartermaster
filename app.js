@@ -22,6 +22,7 @@ const arcaneBtn = document.getElementById("arcane-btn");
 const endTurnBtn = document.getElementById("end-turn-btn");
 const resetBtn = document.getElementById("reset-btn");
 const audioToggleBtn = document.getElementById("audio-toggle");
+const summaryBanner = document.getElementById("summary-banner");
 let soundEnabled = true;
 let audioCtx = null;
 function selectLane(idx){
@@ -39,6 +40,8 @@ function initGame(){
         iron:4,
         mana: 3,
         gameOver: false,
+        outcome: null,
+        summaryReason: "",
         spawns: INITIAL_SPAWNS.map((s)=> ({...s})),
         lanes:[
             {name: "NORTH GATE", hp: 100, maxHp: 100, enemies: []},
@@ -141,6 +144,8 @@ function endTurn(){
     const breached = state.lanes.find((l)=>l.hp<=0);
     if (breached){
         state.gameOver = true;
+        state.outcome = "defeat";
+        state.summaryReason = `${breached.name} was breached.`;
         SoundFX.defeat();
         statusLog.textContent = `DEFEAT: ${breached.name} was breached!`;
         render();
@@ -149,6 +154,8 @@ function endTurn(){
     const totalEnemies = state.lanes.reduce((sum,l)=> sum + l.enemies.length,0);
     if (state.turn >= MAX_TURNS && totalEnemies === 0){
         state.gameOver = true;
+        state.outcome = "victory";
+        state.summaryReason = "All siege waves repelled and every wall held.";
         SoundFX.victory();
         statusLog.textContent = "VICTORY: The citadel held against the siege!";
         render();
@@ -312,6 +319,7 @@ function render(){
     });
     selectedLaneLabel.textContent = `LANE: ${active.name}`;
     renderPreviewText(active);
+    renderSummary();
 }
 repairBtn.onmouseenter = () => setPreview("repair");
 repairBtn.onmouseleave = () => setPreview(null);
@@ -357,4 +365,39 @@ document.addEventListener("keydown", (e)=>{
         initGame();
     }
 });
+function renderSummary(){
+    if (!state.gameOver){
+        summaryBanner.className = "summary-banner hidden";
+        summaryBanner.innerHTML = "";
+        return;
+    }
+    const totalWallHp = state.lanes.reduce((sum,l) => sum + l.hp,0);
+    const totalmaxHp = state.lanes.reduce((sum,l) => sum + l.maxHp, 0);
+    const enemiesRemaining = state.lanes.reduce((sum,l) => sum + l.enemies.length,0);
+    const isVictory = state.outcome === "victory";
+    summaryBanner.className = `summary-banner ${isVictory ? "victory" : "defeat"}`;
+    summaryBanner.innerHTML = `
+        <div class="summary-header">
+            <h2>${isVictory ? "SIEGE VICTORY" : "SIEGE DEFEAT"}</h2>
+            <span>${state.summaryReason}</span>
+        </div>
+        <div class="summary-stats">
+            <span>Turn Reached: <strong>${Math.min(state.turn, MAX_TURNS)}/${MAX_TURNS}</strong></span>
+            <span>Combined Wall HP: <strong>${totalWallHp}/${totalmaxHp}</strong></span>
+            <span>Enemies left: <strong>${enemiesRemaining}</strong></span>
+        </div>
+        <div class="summary-actions">
+            <button id="summary-reset-btn" class="summary-play-again" type="button">
+                PLAY AGAIN[R]
+            </button>
+        </div>
+    `;
+    const summaryResetBtn = document.getElementById("summary-reset-btn");
+    if (summaryResetBtn){
+        summaryResetBtn.onclick = () => {
+            SoundFX.select();
+            initGame();
+        };
+    }
+}
 initGame();
