@@ -32,6 +32,24 @@ const STAGES = [
             {turn: 5,lane: 2,name: "Siege Ogre",hp: 80,atk: 34},
             {turn:6,lane: 0,name: "Warlord",hp: 90, atk:36}
         ]
+    },
+    {
+        name: "Stage 3: Dread Citadel Finale",
+        maxTurns: 8,
+        timber: 5,
+        iron: 5,
+        mana: 4,
+        wallHp: 120,
+        spawns: [
+            {turn:1,lane:0,name:"Iron Vanguard",hp:60,atk:25},
+            {turn: 1,lane:2,name:"Orc Raider", hp:50,atk:24},
+            {turn:2,lane:1, name:"Battering Ram", hp: 75,atk: 34},
+            {turn: 3,lane: 0,name: "Flame Catapult",hp:55,atk:30},
+            {turn:3, lane: 2,name: "Flame Catapult",hp: 55,atk:30},
+            {turn:5, lane: 1,name:"Siege Ogre",hp:85,atk:35},
+            {turn:6, lane: 0,name:"Dread Juggernaut",hp: 100,atk:38},
+            {turn: 7,lane:1,name:"Warlord",hp: 105,atk:40}
+        ]
     }
 ];
 let state = {};
@@ -60,7 +78,7 @@ function selectLane(idx){
 }
 function initGame(){
     previewMode = null;
-    const stage = STAGES[1];
+    const stage = STAGES[0];
     state = {
         stageIndex:1,
         turn :1,
@@ -79,7 +97,7 @@ function initGame(){
         ]
     };
     spawnEnemiesForTurn(1);
-    statusLog.textContent = "Select a lane and issue an order, or end the turn.";
+    statusLog.textContent = `${stage.name} begun - Select a lane and issue an order, or end the turn.`;
     render();
 }
 function spawnEnemiesForTurn(turn){
@@ -433,6 +451,6 @@ function renderSummary(){
     }
 }
 function getCurrentStage(){
-    return STAGES[state.stageIndex ?? 1] || STAGES[1];
+    return STAGES[state.stageIndex ?? 0] || STAGES[0];
 }
 initGame();
