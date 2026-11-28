@@ -200,7 +200,7 @@ const SoundFX = {
         setTimeout(()=> playSound(784,0.24,"triangle",0.09), 220);
     },
     defeat: ()=>{
-        playSound(229, 0.18, "sawtooth", 0.08);
+        playSound(220, 0.18, "sawtooth", 0.08);
         setTimeout(()=> playSound(150, 0.28, "sawtooth",0.08),150);
     }
 };
@@ -274,7 +274,7 @@ function render(){
         const frontEnemy = isSelected ? getFrontEnemy(lane) : null;
         const laneEl = document.createElement("div");
         laneEl.className = `lane ${idx === state.selectedLane ? "selected" : ""} ${isSelected && previewMode === "repair" && !repairBtn.disabled ? "repair-preview" : ""}`;
-        laneEl.onclick = () => selectedLane(idx);
+        laneEl.onclick = () => selectLane(idx);
         const infoEl = document.createElement("div");
         infoEl.className = "lane-info";
         infoEl.innerHTML = `<strong>${lane.name}</strong><span>WALL HP: ${lane.hp}/${lane.maxHp}</span><span class="lane-threat ${threat > 0 ? "danger": ""}"> ${threat > 0 ? `Incoming -${threat} HP` : "Incoming 0 HP"}</span>`;
